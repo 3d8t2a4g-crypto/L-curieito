@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>エルクリエイト | 業務効率化アプリ開発</title>
+<style>
+  :root {
+    /* エルクリエイト：太陽の暖色系 */
+    --brand-main: #ea580c;
+    --brand-sub: #f59e0b;
+    /* シリエル：清流・透明感の水色 */
+    --shiriel-main: #0284c7;
+    --shiriel-bg: #f0f9ff;
+    --shiriel-badge: #e0f2fe;
+    /* トリエル：森林・木漏れ日の黄緑 */
+    --toriel-main: #65a30d;
+    --toriel-bg: #f7fee7;
+    --toriel-badge: #ecfccb;
+
+    --bg: #fffbf5;
+    --text: #1e293b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", sans-serif; color: var(--text); background: var(--bg); line-height: 1.6; }
+
+  /* ① 表紙（太陽をイメージした暖色グラデーション・クリックで消える） */
+  #splash {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(135deg, #f59e0b 0%, #ea580c 60%, #c2410c 100%);
+    color: #fff; display: flex; flex-direction: column;
+    justify-content: center; align-items: center; text-align: center;
+    cursor: pointer; transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+  #splash.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  #splash h1 { font-size: clamp(2.2rem, 6vw, 3.8rem); letter-spacing: 0.18em; margin-bottom: 1rem; text-shadow: 0 2px 12px rgba(0,0,0,0.15); }
+  #splash p { font-size: 0.95rem; opacity: 0.9; animation: blink 1.8s infinite; }
+  @keyframes blink { 0%, 100% { opacity: 0.9; } 50% { opacity: 0.35; } }
+
+  /* ヘッダー */
+  header { background: #fff; padding: 1rem 5%; border-bottom: 3px solid var(--brand-sub); box-shadow: 0 2px 8px rgba(234,88,12,0.06); position: sticky; top: 0; z-index: 100; display: flex; justify-content: space-between; align-items: center; }
+  .logo { font-weight: bold; font-size: 1.3rem; background: linear-gradient(90deg, var(--brand-main), var(--brand-sub)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  nav a { margin-left: 1.2rem; text-decoration: none; color: var(--text); font-weight: bold; font-size: 0.95rem; transition: opacity 0.2s; }
+  nav a:hover { opacity: 0.7; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 3rem 5%; }
+  .card { background: #fff; border-radius: 16px; padding: 2.2rem; margin-bottom: 3rem; box-shadow: 0 6px 20px rgba(0,0,0,0.04); border-top: 6px solid #ccc; }
+  .badge { display: inline-block; font-size: 0.82rem; font-weight: bold; padding: 0.3rem 0.85rem; border-radius: 999px; margin-bottom: 0.6rem; }
+  h2 { font-size: 1.8rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #f1f5f9; }
+  h3 { font-size: 1.15rem; margin: 1.5rem 0 0.75rem; }
+
+  /* 競合比較テーブル共通 */
+  .table-wrap { overflow-x: auto; margin: 1rem 0; }
+  table { width: 100%; border-collapse: collapse; min-width: 500px; font-size: 0.95rem; }
+  th, td { border: 1px solid #e2e8f0; padding: 0.8rem 1rem; text-align: center; }
+  th { background: #f8fafc; font-weight: bold; }
+
+  /* ② シリエル専用カラー（水色・清流） */
+  #shiriel { border-top-color: var(--shiriel-main); }
+  #shiriel .badge { background: var(--shiriel-badge); color: var(--shiriel-main); }
+  #shiriel h2 { color: var(--shiriel-main); }
+  #shiriel .highlight { background: var(--shiriel-bg); font-weight: bold; color: var(--shiriel-main); }
+  #shiriel .btn { background: linear-gradient(135deg, #0ea5e9, var(--shiriel-main)); }
+
+  /* ③ トリエル専用カラー（黄緑・森林） */
+  #toriel { border-top-color: var(--toriel-main); }
+  #toriel .badge { background: var(--toriel-badge); color: var(--toriel-main); }
+  #toriel h2 { color: var(--toriel-main); }
+  #toriel .highlight { background: var(--toriel-bg); font-weight: bold; color: var(--toriel-main); }
+  #toriel .btn { background: linear-gradient(135deg, #84cc16, var(--toriel-main)); }
+
+  /* アプリ導線ボタン共通 */
+  .cta-box { text-align: center; margin-top: 2.2rem; }
+  .btn { display: inline-block; color: #fff; text-decoration: none; font-weight: bold; padding: 1rem 2.6rem; border-radius: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); transition: transform 0.2s, box-shadow 0.2s; }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.18); }
+
+  footer { text-align: center; padding: 2rem; font-size: 0.85rem; color: #78716c; }
+</style>
+</head>
+<body>
+
+  <!-- ① 表紙（太陽の暖色・クリックで消える） -->
+  <div id="splash" onclick="closeSplash()">
+    <h1>エルクリエイト</h1>
+    <p>画面をクリックして進む</p>
+  </div>
+
+  <header>
+    <div class="logo">エルクリエイト</div>
+    <nav>
+      <a href="#shiriel">シリエル</a>
+      <a href="#toriel">トリエル</a>
+    </nav>
+  </header>
+
+  <main class="container">
+
+    <!-- ② シリエル（水色・清流） -->
+    <section id="shiriel" class="card">
+      <span class="badge">広報WEBアプリ</span>
+      <h2>シリエル</h2>
+      <p>現場や店舗の最新情報・お知らせを、専門知識なしでスピーディに発信できる広報WEBアプリです。</p>
+
+      <h3>競合他社との比較（コスト・使用感）</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>比較項目</th>
+              <th class="highlight">シリエル</th>
+              <th>一般的な広報ツールA</th>
+              <th>従来のHP制作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>初期・月額コスト</td>
+              <td class="highlight">低コスト（月額〇〇円〜）</td>
+              <td>月額数万円〜</td>
+              <td>初期数十万円＋保守費</td>
+            </tr>
+            <tr>
+              <td>操作・更新の手間</td>
+              <td class="highlight">スマホから最短1分で更新</td>
+              <td>管理画面が複雑</td>
+              <td>制作会社への依頼が必要</td>
+            </tr>
+            <tr>
+              <td>導入スピード</td>
+              <td class="highlight">即日利用可能</td>
+              <td>審査・設定に数週間</td>
+              <td>1〜3ヶ月</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cta-box">
+        <a href="https://example.com" target="_blank" class="btn">シリエルを使ってみる（WEBアプリへ）</a>
+      </div>
+    </section>
+
+    <!-- ③ トリエル（黄緑・森林） -->
+    <section id="toriel" class="card">
+      <span class="badge">写真台帳作成アプリ</span>
+      <h2>トリエル</h2>
+      <p>現場で撮った写真をそのまま整理し、ワンタップで提出用の工事・作業写真台帳を作成できるアプリです。</p>
+
+      <h3>競合他社との比較（コスト・使用感）</h3>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>比較項目</th>
+              <th class="highlight">トリエル</th>
+              <th>大手施工管理アプリB</th>
+              <th>Excel手作業</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>導入コスト</td>
+              <td class="highlight">圧倒的低価格</td>
+              <td>初期費用＋ID課金で高額</td>
+              <td>無料（人件費が膨大）</td>
+            </tr>
+            <tr>
+              <td>現場での使用感</td>
+              <td class="highlight">直感操作で誰でもすぐ使える</td>
+              <td>多機能すぎて現場が迷う</td>
+              <td>PC持ち帰り作業が発生</td>
+            </tr>
+            <tr>
+              <td>台帳出力</td>
+              <td class="highlight">スマホで即PDF・帳票化</td>
+              <td>PCでの再編集が必要</td>
+              <td>写真貼付・レイアウト調整が大変</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="cta-box">
+        <a href="https://example.com" target="_blank" class="btn">トリエルを使ってみる（アプリ導線へ）</a>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    &copy; エルクリエイト All Rights Reserved.
+  </footer>
+
+  <script>
+    function closeSplash() {
+      document.getElementById('splash').classList.add('hidden');
+    }
+  </script>
+</body>
+</html>
